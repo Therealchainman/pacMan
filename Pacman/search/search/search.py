@@ -72,9 +72,42 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-action_stack = util.Stack()
-action_list = []
-visited = []
+def graph(problem):
+    """
+    This creates my graph that to be used in the searches.
+    It uses a while loop to go through the state list
+    """
+    initial_state = problem.getStartState()
+    state_dict = dict()
+    state_list = [initial_state]
+    visited = []
+    while len(state_list) != 0:
+        state = state_list[-1]
+        successor_list = []
+        actions_list = []
+        for successor in problem.getSuccessors(state):
+            successor_list.append(successor[0])
+        visited.append(state_list.pop())
+        count = 0
+        while len(successor_list) != 0:
+            if count == 0:
+                if successor_list[0] not in visited:
+                    state_dict[state] = [successor_list[0]]
+                    state_list.append(successor_list[0])
+                    successor_list.pop(0)
+                else: 
+                    state_dict[state] = [successor_list[0]]
+                    successor_list.pop(0)
+            else: 
+                if successor_list[0] not in visited: 
+                    state_dict[state].append(successor_list[0])
+                    state_list.append(successor_list[0])
+                    successor_list.pop(0)
+                else: 
+                    state_dict[state].append(successor_list[0])
+                    successor_list.pop(0)
+            count += 1
+    return state_dict
 
 def depthFirstSearch(problem):
     """
@@ -90,41 +123,64 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    print("start", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    # For now let's just pick the first successor. 
-    # This is setting the successor equal to a value.
-    # I am just using a successor and then adding it to
-    # my visited list. 
+    visited = []
+    action_list = []
+    node_list = []
+    visiting_stack = util.Stack()
+    prev_stack = util.Stack()
     node = problem.getStartState()
-    return dfsHelper(node, problem)
+    visiting_stack.push(node)
+    # Base case for the case that you start on the goal state, so there are no actions to take,
+    # so it is an empty list. 
+    if problem.isGoalState(node):
+        return action_list
+    while not visiting_stack.isEmpty():
+        node = visiting_stack.pop()
+        print("nodes visiting:", node)
+        if problem.isGoalState(node):
+            action_list.pop(0)
+            print("amount of actions:", len(action_list))
+            print("actions to take:", action_list)
+            return action_list
+        if node not in visited:
+            visited.append(node)
+            action_list.append(node)
+            print("action list so far:", action_list)
+            successor_list = []
+            prev_stack.push(node)
+            for successor in problem.getSuccessors(node):
+                if successor[0] not in visited:
+                    successor_list.append(successor[0])
+                    visiting_stack.push(successor[0])
+            if len(successor_list) == 0:
+                prev_stack.pop()
+            # The point of this is that we want to see if there are some neighbors available that have not 
+            # been explored yet, if that is the case, we are going to put them on stack for visiting. 
+            # Okay as we are moving back.  
+            # I am stuck, I have no idea how to access this info that is if
+            # I go [1,2,3,4,5,6,7], and there is no successor for 7, that we have not visited.
+            # What should my code do?  It should do something simple, that is go back to 6, right? 
+            # Why does this not work, because everytime I visit something I pop it off my stack.  
+            # which is a little troublesome right?  cause I cannot access.  So I need somehow to keep track.
+            # instead of popping off, I could keep a backup, that is I am popping off of on list, and then
+            # at the end it needs to do something a little bit different.  if len
     util.raiseNotDefined()
 
-def dfsHelper(node, problem):
-    """ 
-    This is a helper function for my
-    implementation of the depth first search algorithm.
-    """
-    if (problem.isGoalState(node)):
-        while (not action_stack.isEmpty()):
-            action = action_stack.pop()
-            action_list += action
-        return reverse(action_list)
-    if (node in visited):
-        return
-    visited += node
-    successors = []
-    for successor in problem.getSuccessors(first_successor):
-        if (successor not in visited):
-            successor_vertex = successor[0]
-            successors[0] = successor_vertex
-    if (len(successors) == 0):
-        return 
-    node = successors[0]
-    action_stack.push(node)
-    return dfsHelper(node)
 
+
+"""
+Here we go I am going to traverse the graph again.  I still have one simple problem,
+Yes I can traverse the entire thing but I do not know how to keep track of the path that lead to the end.  
+My first step is to created a visited set.  Let's suppose it will contain just states?  yeah 
+And I initialize an action list.  This sounds like a good start. 
+These could definite come in handy.  
+Now the crucial part of my code is going to be my while loop.  I am going to 
+use a stack to know that I need to keep iterating until the stack is empty.
+okay so I think it does a lot right now. this code.
+But does it do what I want it to do?  That is the question.  
+
+
+"""
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
