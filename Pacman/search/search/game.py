@@ -683,9 +683,9 @@ class Game:
                     self.unmute()
                     return
             else:
-                print("observation:", observation)
+                # print("observation:", observation)
                 action = agent.getAction(observation)
-                print("action:", action)
+                # print("action:", action)
             self.unmute()
 
             # Execute the action

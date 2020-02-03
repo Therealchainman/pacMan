@@ -123,47 +123,75 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    visited = []
+    # So each of these sets and lists are going to keep track of important data that I need 
+    # in the problem.  For example, the first thing is the visited set which 
+    # essentially keeps track if I have actually moved to a node and visited it.  
+    # action list keeps track of actions that I have taken to get to a new state.
+    # prev_list keeps track of the previous nodes that I have visited.  
+    # tracker is keeping track if a node has already been expanded, and still has unexplored 
+    # successors.
+    # Visiting stack is going to give me a stack of nodes that I will visit and it does it in the 
+    # correct order.  While the action stack is doing same thing for actions though.  
+    # Basically the point of the visiting stack is give me nodes that I will go to next if there was a successor
+    # so it is a stack of all successors.  and I remove the successor once I go visit it.  So it keeps track
+    # of nodes I still should visit.  
+    visited_set = set()
     action_list = []
-    node_list = []
+    prev_list = []
+    tracker = set()
     visiting_stack = util.Stack()
-    prev_stack = util.Stack()
+    action_stack = util.Stack()
     node = problem.getStartState()
     visiting_stack.push(node)
-    # Base case for the case that you start on the goal state, so there are no actions to take,
-    # so it is an empty list. 
+    prev_list.append(node)
+    # This first if statement is checked if we are starting at the goal state, if so return an 
+    # empty action list.  
     if problem.isGoalState(node):
         return action_list
     while not visiting_stack.isEmpty():
-        node = visiting_stack.pop()
-        print("nodes visiting:", node)
+        # This gives me the most recent element added to previous list.  so that is where I want to visit now. 
+        node = prev_list[-1]
         if problem.isGoalState(node):
-            action_list.pop(0)
-            print("amount of actions:", len(action_list))
-            print("actions to take:", action_list)
             return action_list
-        if node not in visited:
-            visited.append(node)
-            action_list.append(node)
-            print("action list so far:", action_list)
+        if node not in visited_set:
+            visited_set.add(node)
             successor_list = []
-            prev_stack.push(node)
+            # Here I am expanding the node to see its successors, and if for some reason it has more
+            # than one successor that is unexplored then I will track that this node so that it will
+            # not be expanded again when I backtrack.
             for successor in problem.getSuccessors(node):
-                if successor[0] not in visited:
+                if successor[0] not in visited_set:
                     successor_list.append(successor[0])
                     visiting_stack.push(successor[0])
+                    action_stack.push(successor[1])
+                if len(successor_list) > 1: 
+                    tracker.add(node)
+            # So if the length is 0 that indicates there is nowhere to go except to backtrack.  So to backtrack 
+            # I want to remove the action that took me to my current place and remove the node I am at.  
+            # so now I will return to the previous node in my while loop.  
             if len(successor_list) == 0:
-                prev_stack.pop()
-            # The point of this is that we want to see if there are some neighbors available that have not 
-            # been explored yet, if that is the case, we are going to put them on stack for visiting. 
-            # Okay as we are moving back.  
-            # I am stuck, I have no idea how to access this info that is if
-            # I go [1,2,3,4,5,6,7], and there is no successor for 7, that we have not visited.
-            # What should my code do?  It should do something simple, that is go back to 6, right? 
-            # Why does this not work, because everytime I visit something I pop it off my stack.  
-            # which is a little troublesome right?  cause I cannot access.  So I need somehow to keep track.
-            # instead of popping off, I could keep a backup, that is I am popping off of on list, and then
-            # at the end it needs to do something a little bit different.  if len
+                prev_list.pop()
+                action_list.pop()
+            # if the length is not 0 then I want to visit that node that is a successor and I will do that
+            # by popping off my visiting stack. and adding it to my prev_list
+            else:
+                node = visiting_stack.pop()
+                action = action_stack.pop()
+                action_list.append(action)
+                prev_list.append(node)
+        # I need to check that a node is not in my tracker, because if it is not in my tracker.  
+        # If for some reason the node is not in my tracker I need to keep going back, but 
+        # if it is in my tracker that means it still has some successors unexplored.  so then you need
+        # to explore those nodes. 
+        else:
+            if node not in tracker:
+                prev_list.pop()
+                action_list.pop()
+            else: 
+                node = visiting_stack.pop()
+                action = action_stack.pop()
+                action_list.append(action)
+                prev_list.append(node)
     util.raiseNotDefined()
 
 

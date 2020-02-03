@@ -127,8 +127,8 @@ class SearchAgent(Agent):
         """
         if 'actionIndex' not in dir(self): self.actionIndex = 0
         i = self.actionIndex
-        print("actionIndex", i)
-        print("action length found by the searth algorithm", len(self.actions))
+        # print("actionIndex", i)
+        # print("action length found by the searth algorithm", len(self.actions))
         self.actionIndex += 1
         if i < len(self.actions):
             return self.actions[i]
