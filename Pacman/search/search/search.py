@@ -260,27 +260,26 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    visiting = util.PriorityQueueWithFunction(heuristic)
-    actions = util.PriorityQueueWithFunction(heuristic)
-    costq = util.PriorityQueueWithFunction(heuristic)
+    visiting_order = util.PriorityQueueWithFunction(cost_calculator)
     visited = set()
-    directions = []
+    actions = []
     node = problem.getStartState()
-    visiting.push([node])
-    costq.push(0)
+    visiting_order.push(([node], problem, heuristic, actions, [0]))
     visited.add(node)
     if problem.isGoalState(node):
-        return directions
-    while not visiting.isEmpty():
+        return actions
+    while not visiting_order.isEmpty():
         # the first path that I added to my queue. 
-        path = visiting.pop()
-        cost = costq.pop()
+        quintuple = visiting_order.pop()
         # if I have actions, I need to take my most recent actions that corresponds to the same path
-        if not actions.isEmpty():
-            directions = actions.pop()
-            action = directions[-1]
-        # Getting the last node in my path, most recent node I'v visited. 
+        directions = quintuple[3]
+        if len(directions) != 0:
+            actions = directions[-1]
+        # Getting the last node in my path, most recent node I'v visited.
+        path = quintuple[0] 
         node = path[-1]
+        costsoFar = quintuple[4]
+        cost = costsoFar[-1]
         if problem.isGoalState(node):
             return directions
         # Create a new path for each successor that has not been explored.  So I am exploring all successors.
@@ -294,14 +293,24 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             if s[0] not in visited or problem.isGoalState(s[0]):
                 new_path = list(path)
                 new_path.append(s[0])
-                new_cost = cost + s[2] + heuristic
-                visiting.push(new_path)
+                new_cost = list(costsoFar)
+                new_cost.append(cost + s[2])
+                new_directions = list(directions)
+                new_directions.append(s[1])
+                visiting_order.push((new_path, problem, heuristic, new_directions, new_cost))
                 visited.add(s[0])
-                costq.push(new_costt)
-                new_action = list(directions)
-                new_action.append(s[1])
-                actions.push(new_action)
     util.raiseNotDefined()
+
+def cost_calculator(inputs):
+    # input is equal to a tuple that represents the (state, problem, heuristic, action, cost)
+    stateList = inputs[0]
+    state = stateList[-1]
+    problem = inputs[1]
+    heuristic = inputs[2]
+    action = inputs[3]
+    cost = inputs[4][-1]
+    total_cost = heuristic(state, problem) + cost
+    return total_cost
 
 
 # Abbreviations
