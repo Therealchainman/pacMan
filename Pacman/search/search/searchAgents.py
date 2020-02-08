@@ -433,16 +433,6 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
-def shortestPath(start, goal, problem):
-    # print "searching shortest path"
-    new_problem = PositionSearchProblem(problem.startingGameState,
-                                        start = start, goal = goal, warn = False)
-    print("start for shorest path", start)
-    print("goal for shortest path", goal)
-    print("The problem", problem)
-    print("new problem", new_problem)
-    return len(search.astar(new_problem, heuristic = manhattanHeuristic))
-
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -477,7 +467,7 @@ def foodHeuristic(state, problem):
     # because we have reached our goal. 
     if len(foodList) == 0:
         return 0
-    value = max(shortestPath(position, food, problem) for food in foodList)
+    value = max(manhattanDistance(position, food) for food in foodList)
     return value
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -508,7 +498,7 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
+        
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
