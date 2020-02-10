@@ -497,8 +497,7 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-
-        
+        return search.ucs(problem)
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -520,7 +519,6 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         "Stores information from the gameState.  You don't need to change this."
         # Store the food for later reference
         self.food = gameState.getFood()
-
         # Store info for the PositionSearchProblem (no need to change this)
         self.walls = gameState.getWalls()
         self.startState = gameState.getPacmanPosition()
@@ -531,10 +529,13 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
-        """
-        x,y = state
 
-        "*** YOUR CODE HERE ***"
+        So I want to return a list of food right and if it is one of them
+
+        """
+        foodList = self.food.asList()
+        isGoal = True if state in foodList else False
+        return isGoal
         util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
