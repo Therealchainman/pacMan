@@ -467,8 +467,18 @@ def foodHeuristic(state, problem):
     # because we have reached our goal. 
     if len(foodList) == 0:
         return 0
-    value = max(manhattanDistance(position, food) for food in foodList)
+    value = max(shortestPath(problem, food, position) for food in foodList)
     return value
+
+def shortestPath(problem, newGoal, pacmanPos):
+    """
+    This is a helper function for my foodHeuristic.  The idea behind this helper function is that
+    it finds the lowest cost path to a dot from the pacman position with considering the walls of course.
+    That means if the pacman follows the path it will result in the lowest cost to get to that dot.  
+    """
+    updateProblem = PositionSearchProblem(problem.startingGameState, goal = newGoal, start = pacmanPos, warn = False)
+    path_length = len(search.astar(updateProblem, manhattanHeuristic))
+    return path_length
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -497,7 +507,7 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-        return search.ucs(problem)
+        return search.astar(problem)
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
