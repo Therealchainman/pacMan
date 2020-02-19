@@ -337,8 +337,36 @@ def betterEvaluationFunction(currentGameState):
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
+    There is one more element of the gamestate that is essential
+    for evaluating the state of the game.  
+    For instance suppose the game state results in a decrease in 
+    the relative distance to the closest food pellet.
+    That is desirable correct.  So I should
+    subtract the manhattan distance.  This seems to be the simplest.
+    But how does it know it comparatively reduce the distance compared
+    to original state.  Or rather we rate a game state based on the manhattan
+    distance.  This makes sense so think about it if you are closer to a food 
+    pellet, would you not want to give that a better evalatuation,  so 
+    that means it should have a weight of a negative value so that it is 
+    more negative evaluated for when you are farther away from a food pellet.
+    Now the problem is do I want to consider all the food or just the closest one, and 
+    how do you do that in the first place?  
     """
-    
+    foodAmount = currentGameState.getNumFood()
+    capsuleList = currentGameState.getCapsules()
+    capsuleAmount = len(capsuleList)
+    score = currentGameState.getScore()
+    numGhosts = currentGameState.getNumAgents() - 1
+    pacmanPos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    foodList = food.asList()
+    distList = [util.manhattanDistance(foodPos, pacmanPos) for foodPos in foodList]
+    if len(distList) != 0:
+        distToClosestFood = min(distList)
+    else:
+        distToClosestFood = 0
+    evaluate = 4*score - numGhosts - capsuleAmount - 2*foodAmount - 2*distToClosestFood
+    return evaluate
     util.raiseNotDefined()
 
 # Abbreviation
