@@ -206,7 +206,7 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
         pred = self.getPredecessor()
         stateList = self.mdp.getStates()
         for s in stateList:
-          if s is not "TERMINAL_STATE":
+          if not self.mdp.isTerminal(s):
             valQ = self.computeQValues(s)
             diff = abs(self.values[s] - max(valQ))
             priority.push(s, -diff)
@@ -215,17 +215,16 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
             break
           s = priority.pop()
           valQ = self.computeQValues(s)
-          if s is not "TERMINAL_STATE":
+          if not self.mdp.isTerminal(s):
             self.values[s] = max(valQ)
           for p in pred[s]:
             diff = abs(self.values[p] - max(self.computeQValues(p)))
-          if diff > self.theta:
-            priority.update(p, -diff)
+            if diff > self.theta:
+              priority.update(p, -diff)
 
     def getPredecessor(self):
         """
           Returns the predecessors for all states in dictionary format.  (key, value) = (state, list of predecessors)
-
         """
         stateList = self.mdp.getStates()
         pred = dict()
@@ -235,9 +234,8 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
             transitionList = self.mdp.getTransitionStatesAndProbs(s, a)
             numSuccessor = len(transitionList)
             nextStates = [transitionList[x][0] for x in range(numSuccessor)]
-            for index in range(numSuccessor):
-              if transitionList[index][1] != 0:
-                ns = transitionList[index][0]
+            for ns, prob in transitionList:
+              if prob != 0:
                 if ns in pred:
                   pred[ns].add(s)
                 else:
