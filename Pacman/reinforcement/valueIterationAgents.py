@@ -122,8 +122,6 @@ class ValueIterationAgent(ValueEstimationAgent):
           actionDict[a] = self.getQValue(state, a)
         action = actionDict.argMax()
         return action
-        stateValues = self.getValue(state)
-
         util.raiseNotDefined()
 
     def getPolicy(self, state):
