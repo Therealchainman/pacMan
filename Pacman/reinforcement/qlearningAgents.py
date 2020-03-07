@@ -49,7 +49,7 @@ class QLearningAgent(ReinforcementAgent):
           Should return 0.0 if we have never seen a state
           or the Q node value otherwise
         """
-        
+        return self.qValues[(state, action)]
         util.raiseNotDefined()
 
 
@@ -94,16 +94,20 @@ class QLearningAgent(ReinforcementAgent):
           no legal actions, which is the case at the terminal state, you
           should choose None as the action.
 
+          This is implementing the epsilon-greedy method of choosing an action
+          Where with probability epsilon I will explore the environment.  
+          Explore the environment by taking some random action without regard
+          to future reward.  
+
           HINT: You might want to use util.flipCoin(prob)
           HINT: To pick randomly from a list, use random.choice(list)
         """
         # Pick Action
         legalActions = self.getLegalActions(state)
-        action = None
         coinFlip = util.flipCoin(self.epsilon)
         if (len(legalActions) == 0):
-          return None
-        if coinFlip:
+          action = None
+        elif coinFlip:
           action = random.choice(legalActions)
         else:
           action = self.computeActionFromQValues(state)
@@ -119,9 +123,16 @@ class QLearningAgent(ReinforcementAgent):
           NOTE: You should never call this function,
           it will be called on your behalf
         """
-        qVal = reward + self.discount*self.getQValue(nextState, action)
+        qVal = []
+        nextActions = self.getLegalActions(nextState)
+        if (len(nextActions) == 0):
+          optimalQValue = float(0)
+        else: 
+          for na in nextActions:
+            qVal += [self.getQValue(nextState, na)]
+          optimalQValue = max(qVal)
+        qVal = (1 - self.alpha)*self.qValues[(state, action)] + self.alpha*(reward + self.discount*optimalQValue)
         self.qValues[(state, action)] = qVal
-        util.raiseNotDefined()
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
