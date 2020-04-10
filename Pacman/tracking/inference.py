@@ -75,7 +75,11 @@ class DiscreteDistribution(dict):
         {}
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        totality = self.total()
+        if totality > 0:   
+            norm_dict = {}
+            for k in self.keys():
+                self[k] = self[k] / totality
 
     def sample(self):
         """
@@ -99,6 +103,22 @@ class DiscreteDistribution(dict):
         0.0
         """
         "*** YOUR CODE HERE ***"
+        weighted_val = [0]
+        totality = self.total()
+        val = []
+        keys = []
+        for ov in self.values():
+            val.append(ov)
+        for k in self.keys():
+            keys.append(k)
+        valkry = tuple(zip(val, keys))
+        rand = random.random()
+        for v, k in valkry:
+            index = keys.index(k)
+            v = v / totality + weighted_val[index]
+            weighted_val.append(v)
+            if (rand <= v and rand >= weighted_val[index]):
+                return keys[index] 
         raiseNotDefined()
 
 

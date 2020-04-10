@@ -55,6 +55,7 @@ def getObservationProbability(noisyDistance, trueDistance):
         for error , prob in zip(SONAR_NOISE_VALUES, SONAR_NOISE_PROBS):
             distribution[max(1, noisyDistance - error)] += prob
         observationDistributions[noisyDistance] = distribution
+    print(f"observation distributions: {observationDistributions}")
     return observationDistributions[noisyDistance][trueDistance]
 
 ###################################################
