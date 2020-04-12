@@ -144,3 +144,28 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
+        ghostPos = []
+        successorPos = []
+        mazeDistance = float('inf')
+        bestAction = Directions.STOP
+        for gDist in livingGhostPositionDistributions:
+            # print(f"the ghost distributions {gDist}")
+            ghostPos += [gDist.argMax()]
+            # print(f"The ghost position {ghostPos}")
+        # ghostPos = livingGhostPositionDistributions.argMax()
+        for action in legal:
+            # print(f"The action: {action}")
+            # I want to find the successor position, that is the next position if pacman takes
+            # the provided action.  I need to find its successor based on pacman's current
+            # position so probably use pacmanPosition
+            successorPosition = Actions.getSuccessor(pacmanPosition, action)
+            for g in ghostPos:
+                distance = self.distancer.getDistance(g, successorPosition)
+                if distance < mazeDistance:
+                    mazeDistance = distance
+                    bestAction = action
+        return bestAction
+                # print(f"what I am unpacking {g}")
+                # print(f"The successor position {successorPosition}")
+        # mazDistance = self.distancer.getDistance(pos1, pos2)
+        #After action find the successor position of an action.
