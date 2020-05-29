@@ -433,9 +433,12 @@ class DoubleInferenceAgent(bustersAgents.BustersAgent):
                 if key[1] != 1:
                     refDist[key] = 1.0 / float(len(refDist))
         l2 = 0
+        # print(dist)
         for k in refDist.keys():
             l2 += (dist[k] - refDist[k]) ** 2
+            # print(l2)
         if l2 > self.L2Tolerance:
+            # print(self.errors)
             if self.errors == 0:
                 t = (self.grades.currentQuestion, self.numMoves, l2)
                 summary = "%s) Distribution deviated at move %d by %0.4f (squared norm) from the correct answer.\n" % t
